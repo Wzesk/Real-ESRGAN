@@ -41,35 +41,3 @@ sr_image = model.predict(image)
 
 sr_image.save('results/sr_image.png')
 ```
-
-### Examples
-
----
-
-Low quality image:
-
-![](inputs/lr_image.png)
-
-Real-ESRGAN result:
-
-![](results/sr_image.png)
-
----
-
-Low quality image:
-
-![](inputs/lr_face.png)
-
-Real-ESRGAN result:
-
-![](results/sr_face.png)
-
----
-
-Low quality image:
-
-![](inputs/lr_lion.png)
-
-Real-ESRGAN result:
-
-![](results/sr_lion.png)
