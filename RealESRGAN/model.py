@@ -106,6 +106,6 @@ def upsample_folder(directory):
 
                 up_path = file_path.replace('.png','_up.png')
                 up_files.append(up_path)
-                Image.fromarray(sr_img).save(up_path)
+                sr_img.save(up_path)
 
     return up_files
