@@ -1,7 +1,6 @@
 # predict.py
 from cog import BasePredictor, Input, Path
 from PIL import Image
-
 import RealESRGAN.model as re
 
 class Predictor(BasePredictor):
@@ -16,16 +15,12 @@ class Predictor(BasePredictor):
         Superresolve a low resolution image and get a high resolution image.
         """
         # Load image
+    
         lr_img = Image.open(image).convert("RGB")
-        lr_array = np.array(lr_img)
-
         # Run upsampling
-        hr_array = re.predict(lr_array)
-        hr_img = Image.fromarray(hr_array)
-
+        hr_img = re.predict(lr_img)
         # Save the resulting mask
         output_path = "upsampled_image.png"
         hr_img.save(output_path)
-
         # Return mask as final output
         return Path(output_path)
