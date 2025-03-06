@@ -10,6 +10,8 @@ from .rrdbnet_arch import RRDBNet
 from .utils import pad_reflect, split_image_into_overlapping_patches, stich_together, \
                    unpad_image
 
+from . import tario
+import pandas as pd
 
 HF_MODELS = {
     2: dict(
@@ -109,3 +111,45 @@ def upsample_folder(directory):
                 sr_img.save(up_path)
 
     return up_files
+
+def upsample_tar(folder_path):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = RealESRGAN(device, scale=4)
+    model.load_weights(f'Real-ESRGAN/weights/RealESRGAN_x4plus.pth')#'weights/RealESRGAN_x{model_scale}.pth')
+    
+    table = folder_path + "/" + "proj_track.csv"        
+    rgnir_tar_path = folder_path+'/rgnir.tar'
+    repaired_tar_path = folder_path+'/rgnir_fd.tar'
+    upsampled_tar_path = folder_path+'/upsampled.tar'
+
+    df = pd.read_csv(table)
+    df['upsampled'] = False
+
+      #if column df['cloud_island_intersection'] does not exist, create it.  This would be created by the image repair/impution step
+    if 'cloud_island_intersection' not in df.columns:
+        df['cloud_island_intersection'] = False
+    if 'repaired' not in df.columns:
+        df['repaired'] = False
+    
+    clean_downloads = df[(df['cloud_island_intersection'].astype(bool) == False) & (df['rgnir_download'] == True) ]
+    for i, name in enumerate(clean_downloads['name'].tolist()):
+        if clean_downloads['repaired'].tolist()[i] == False:
+            input_tar_path = rgnir_tar_path
+        else:
+            input_tar_path = repaired_tar_path
+
+        lowtar = tario.tar_io(input_tar_path)                       
+        low_img = lowtar.get_from_tar(name+'_rgnir.png')
+        
+        low_array = np.array(low_img)[:,:,:3]
+        sr_image = model.predict(np.array(low_array))
+        
+        hightar = tario.tar_io(upsampled_tar_path)
+        hightar.save_to_tar(sr_image,name+'_sr.png',overwrite=True)
+        
+        df.loc[df['name'] == name, 'upsampled'] = True
+
+        #save df to csv
+        df.to_csv(table, index=False)
+
+    return df
