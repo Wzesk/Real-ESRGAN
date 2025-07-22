@@ -1,16 +1,3 @@
-# Real-ESRGAN
-PyTorch implementation of a Real-ESRGAN model trained on custom dataset. This model shows better results on faces compared to the original version. It is also easier to integrate this model into your projects.
-
-> This is not an official implementation. We partially use code from the [original repository](https://github.com/xinntao/Real-ESRGAN)
-
-Real-ESRGAN is an upgraded [ESRGAN](https://arxiv.org/abs/1809.00219) trained with pure synthetic data is capable of enhancing details while removing annoying artifacts for common real-world images. 
-
-You can try it in [google colab](https://colab.research.google.com/drive/1YlWt--P9w25JUs8bHBOuf8GcMkx-hocP?usp=sharing) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1YlWt--P9w25JUs8bHBOuf8GcMkx-hocP?usp=sharing)
-
-- [Paper (Real-ESRGAN: Training Real-World Blind Super-Resolution with Pure Synthetic Data)](https://arxiv.org/abs/2107.10833)
-- [Original implementation](https://github.com/xinntao/Real-ESRGAN)
-- [Huggingface 🤗](https://huggingface.co/sberbank-ai/Real-ESRGAN)
-
 ### Installation
 
 ```bash
@@ -42,34 +29,23 @@ sr_image = model.predict(image)
 sr_image.save('results/sr_image.png')
 ```
 
-### Examples
+## Contributors
+This module and the larger project it is a part of has had numerous contributors, including:
 
----
+Walter Zesk, Tishya Chhabra, Leandra Tejedor, Philip Ndikum
 
-Low quality image:
+Sarah Dole, Skylar Tibbits, Peter Stempel
 
-![](inputs/lr_image.png)
+## Reference
+The current active segmentation model is fine tuned and forked from: 
+https://github.com/ai-forever/Real-ESRGAN
 
-Real-ESRGAN result:
+Real-ESRGAN is an upgraded [ESRGAN](https://arxiv.org/abs/1809.00219) trained with pure synthetic data is capable of enhancing details while removing annoying artifacts for common real-world images. 
+- [Paper (Real-ESRGAN: Training Real-World Blind Super-Resolution with Pure Synthetic Data)](https://arxiv.org/abs/2107.10833)
+- [Original implementation](https://github.com/xinntao/Real-ESRGAN)
+- [Huggingface 🤗](https://huggingface.co/sberbank-ai/Real-ESRGAN)
 
-![](results/sr_image.png)
 
----
+This project draws extensive inspiration from the [Coastsal Project](https://github.com/kvos/CoastSat) described in detail here:
 
-Low quality image:
-
-![](inputs/lr_face.png)
-
-Real-ESRGAN result:
-
-![](results/sr_face.png)
-
----
-
-Low quality image:
-
-![](inputs/lr_lion.png)
-
-Real-ESRGAN result:
-
-![](results/sr_lion.png)
+Vos K., Splinter K.D., Harley M.D., Simmons J.A., Turner I.L. (2019). CoastSat: a Google Earth Engine-enabled Python toolkit to extract shorelines from publicly available satellite imagery. Environmental Modelling and Software. 122, 104528. https://doi.org/10.1016/j.envsoft.2019.104528 (Open Access)
