@@ -106,7 +106,16 @@ def upsample_folder(directory):
                 img = np.array(img)
                 sr_img = model.predict(np.array(img))
 
-                up_path = file_path.replace('.png','_up.png')
+
+                # Replace the last directory in the path with 'UP', works for any input path
+                dir_parts = os.path.normpath(file_path).split(os.sep)
+                if len(dir_parts) > 1:
+                    dir_parts[-2] = 'UP'
+                    up_dir = os.sep.join(dir_parts[:-1])
+                else:
+                    up_dir = 'UP'
+                os.makedirs(up_dir, exist_ok=True)
+                up_path = os.path.join(up_dir, os.path.basename(file_path).replace('.png', '_up.png'))
                 up_files.append(up_path)
                 sr_img.save(up_path)
 
