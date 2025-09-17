@@ -95,7 +95,11 @@ def upsample_folder(directory):
     print("upsampling images from: " + directory)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = RealESRGAN(device, scale=4)
-    model.load_weights(f'Real-ESRGAN/weights/RealESRGAN_x4plus.pth')#'weights/RealESRGAN_x{model_scale}.pth')
+    
+    # Get path relative to this model.py file
+    model_dir = os.path.dirname(os.path.abspath(__file__))
+    weights_path = os.path.join(model_dir, '..', 'weights', 'RealESRGAN_x4plus.pth')
+    model.load_weights(weights_path)
 
     up_files = []
     for root, directories, filenames in os.walk(directory):
@@ -123,7 +127,11 @@ def upsample_folder(directory):
 def upsample_tar(folder_path):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = RealESRGAN(device, scale=4)
-    model.load_weights(f'Real-ESRGAN/weights/RealESRGAN_x4plus.pth')#'weights/RealESRGAN_x{model_scale}.pth')
+    
+    # Get path relative to this model.py file
+    model_dir = os.path.dirname(os.path.abspath(__file__))
+    weights_path = os.path.join(model_dir, '..', 'weights', 'RealESRGAN_x4plus.pth')
+    model.load_weights(weights_path)
     
     table = folder_path + "/" + "proj_track.csv"        
     rgnir_tar_path = folder_path+'/rgnir.tar'
