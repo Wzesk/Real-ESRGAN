@@ -92,6 +92,7 @@ class RealESRGAN:
         return sr_img
     
 def upsample_folder(directory):
+    print("upsampling images from: " + directory)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = RealESRGAN(device, scale=4)
     model.load_weights(f'Real-ESRGAN/weights/RealESRGAN_x4plus.pth')#'weights/RealESRGAN_x{model_scale}.pth')
@@ -101,11 +102,9 @@ def upsample_folder(directory):
         for filename in filenames:
             if filename.endswith('.png'):
                 file_path = os.path.join(root,filename)
-
                 img = Image.open(file_path)
                 img = np.array(img)
                 sr_img = model.predict(np.array(img))
-
 
                 # Replace the last directory in the path with 'UP', works for any input path
                 dir_parts = os.path.normpath(file_path).split(os.sep)
