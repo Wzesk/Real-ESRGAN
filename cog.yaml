@@ -1,0 +1,24 @@
+# cog.yaml
+build:
+  # Set to true if your model (or PyTorch build) needs a GPU
+  gpu: true
+
+  python_version: "3.10.12"
+
+  python_packages:
+    - "opencv-python"
+    - "Pillow"
+    - "torch>=1.7"
+    - "torchvision>=0.8.0"
+    - "numpy==1.26.4"
+    - "tqdm"
+    - "huggingface-hub==0.25.2"
+
+  # Install needed Ubuntu packages
+  system_packages:
+    - ffmpeg
+    - libsm6
+    - libxext6
+
+predict: "predict.py:Predictor"
+
