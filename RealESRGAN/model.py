@@ -4,7 +4,7 @@ from torch.nn import functional as F
 from PIL import Image
 import numpy as np
 import cv2
-from huggingface_hub import hf_hub_url, cached_download
+from huggingface_hub import hf_hub_url, hf_hub_download
 
 from .rrdbnet_arch import RRDBNet
 from .utils import pad_reflect, split_image_into_overlapping_patches, stich_together, \
@@ -42,9 +42,13 @@ class RealESRGAN:
             config = HF_MODELS[self.scale]
             cache_dir = os.path.dirname(model_path)
             local_filename = os.path.basename(model_path)
-            config_file_url = hf_hub_url(repo_id=config['repo_id'], filename=config['filename'])
-            cached_download(config_file_url, cache_dir=cache_dir, force_filename=local_filename)
-            print('Weights downloaded to:', os.path.join(cache_dir, local_filename))
+            downloaded_path = hf_hub_download(repo_id=config['repo_id'], filename=config['filename'], cache_dir=cache_dir, local_files_only=False)
+            # Move the downloaded file to the expected location if needed
+            expected_path = os.path.join(cache_dir, local_filename)
+            if downloaded_path != expected_path:
+                import shutil
+                shutil.copy2(downloaded_path, expected_path)
+            print('Weights downloaded to:', expected_path)
         
         loadnet = torch.load(model_path)
         if 'params' in loadnet:
@@ -88,3 +92,57 @@ class RealESRGAN:
         sr_img = Image.fromarray(sr_img)
 
         return sr_img
+
+
+def upsample_folder(input_folder, output_folder=None, scale=4, device=None):
+    """
+    Upsample all images in a folder using RealESRGAN.
+    
+    Args:
+        input_folder (str): Path to input folder containing images
+        output_folder (str, optional): Path to output folder. If None, creates 'upsampled' subfolder
+        scale (int): Upscaling factor (2, 4, or 8)
+        device (str, optional): Device to use ('cuda' or 'cpu'). Auto-detects if None
+        
+    Returns:
+        list: List of output image paths
+    """
+    if device is None:
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    elif isinstance(device, str):
+        device = torch.device(device)
+    
+    # Set up output folder
+    if output_folder is None:
+        output_folder = os.path.join(input_folder, 'upsampled')
+    os.makedirs(output_folder, exist_ok=True)
+    
+    # Initialize model
+    model = RealESRGAN(device, scale=scale)
+    weights_path = f'weights/RealESRGAN_x{scale}.pth'
+    model.load_weights(weights_path, download=True)
+    
+    # Process images
+    upsampled_images = []
+    supported_formats = ('.png', '.jpg', '.jpeg', '.tiff', '.tif', '.bmp')
+    
+    for filename in os.listdir(input_folder):
+        if filename.lower().endswith(supported_formats):
+            input_path = os.path.join(input_folder, filename)
+            
+            # Create output filename
+            name, ext = os.path.splitext(filename)
+            output_filename = f"{name}_x{scale}{ext}"
+            output_path = os.path.join(output_folder, output_filename)
+            
+            try:
+                # Load and process image
+                image = Image.open(input_path).convert('RGB')
+                sr_image = model.predict(image)
+                sr_image.save(output_path)
+                upsampled_images.append(output_path)
+                print(f"Upsampled: {filename} -> {output_filename}")
+            except Exception as e:
+                print(f"Error processing {filename}: {str(e)}")
+                
+    return upsampled_images
