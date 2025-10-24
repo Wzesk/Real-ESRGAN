@@ -119,7 +119,19 @@ def upsample_folder(input_folder, output_folder=None, scale=4, device=None):
     
     # Initialize model
     model = RealESRGAN(device, scale=scale)
-    weights_path = f'weights/RealESRGAN_x{scale}.pth'
+    
+    # Use weights directory relative to this model file, with fallback
+    try:
+        model_dir = os.path.dirname(os.path.dirname(__file__))  # Go up to Real-ESRGAN root
+        weights_path = os.path.join(model_dir, 'weights', f'RealESRGAN_x{scale}.pth')
+        
+        # Fallback to current directory if the model weights don't exist
+        if not os.path.exists(weights_path):
+            weights_path = f'weights/RealESRGAN_x{scale}.pth'
+    except:
+        # Final fallback
+        weights_path = f'weights/RealESRGAN_x{scale}.pth'
+        
     model.load_weights(weights_path, download=True)
     
     # Process images
